@@ -1,7 +1,7 @@
 package com.example.chucknorrisproject
 
 import CustomAdapter
-import JokesData
+import Joke
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,12 +18,11 @@ class MainActivity : AppCompatActivity() {
         recyclerview.layoutManager = LinearLayoutManager(this)
 
         // ArrayList of class ItemsViewModel
-        val data = ArrayList<JokesData>()
+        val data = ArrayList<Joke>()
 
         // This loop will create 20 Views containing
-        // the image with the count of view
         for (i in 1..20) {
-            data.add(JokesData("Item " + i))
+            //data.add(Joke())
         }
 
         // This will pass the ArrayList to our Adapter
