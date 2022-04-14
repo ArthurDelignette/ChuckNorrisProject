@@ -1,14 +1,16 @@
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chucknorrisproject.R
 
-class CustomAdapter(private val mList: List<Joke>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class CustomAdapter : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
     // create new views
+    private val mList = ArrayList<Joke>()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
         // that is used to hold list item
@@ -31,6 +33,12 @@ class CustomAdapter(private val mList: List<Joke>) : RecyclerView.Adapter<Custom
     // return the number of the items in the list
     override fun getItemCount(): Int {
         return mList.size
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(joke: Joke) {
+        mList.add(joke)
+        notifyDataSetChanged()
     }
 
     // Holds the views for adding it to image and text

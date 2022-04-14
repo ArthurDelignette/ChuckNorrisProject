@@ -9,7 +9,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
 object JokeApiServiceFactory {
     fun createJAS(): JokeApiService = Retrofit.Builder()
-        .baseUrl("https://api.chucknorris.io/jokes")
+        .baseUrl("https://api.chucknorris.io/jokes/")
         .addConverterFactory(Json.asConverterFactory(MediaType.get("application/json")))
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()
