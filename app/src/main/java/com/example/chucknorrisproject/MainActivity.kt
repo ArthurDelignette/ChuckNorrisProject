@@ -1,22 +1,22 @@
 package com.example.chucknorrisproject
 
 import CustomAdapter
-import Joke
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.chucknorrisproject.R.id.buttonAddJoke
 import com.example.chucknorrisproject.R.id.progressBar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+
 
 class MainActivity : AppCompatActivity() {
     val compositeDisposable = CompositeDisposable()
@@ -28,47 +28,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val recyclerview = findViewById<RecyclerView>(R.id.recyclerView)
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
         // this creates a vertical layout Manager
-        recyclerview.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         // ArrayList of class ItemsViewModel
 
-        recyclerview.adapter = adapter
+        recyclerView.adapter = adapter
 
-        // This loop will create 20 Views containing
 
-        val button = findViewById<Button>(buttonAddJoke)
         val progressBar = findViewById<ProgressBar>(progressBar)
-        button.setOnClickListener(View.OnClickListener {
-            val Singledejoke = JokeApiServiceFactory.createJAS().giveMeAJoke()
-            progressBar.visibility = View.VISIBLE
-            repeat(10){
-                compositeDisposable.add(Singledejoke
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribeBy(
-                        onError = {
-                            Log.e(tag, "Je n'arrive pas a lire le Single", it)
-                        },
-                        onSuccess = {
-                            Log.i(tag, it.value)
-                            adapter.updateList(it)
 
-                        }
-                    ))
+        progressBar.visibility = View.VISIBLE
+        repeat(15) {
+            getJokes()
+        }
+
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!recyclerView.canScrollVertically(1)) {
+                    getJokes()
+                }
             }
-            progressBar.visibility = View.INVISIBLE
         })
-
-
-
-
-        // This will pass the ArrayList to our Adapter
-
-
-        // Setting the Adapter with the recyclerview
+        progressBar.visibility = View.INVISIBLE
 
     }
 
@@ -78,5 +64,22 @@ class MainActivity : AppCompatActivity() {
         compositeDisposable.clear()
         Log.i(tag, "Il en reste :${compositeDisposable.size()}")
 
+    }
+
+    public fun getJokes(){
+        val Singledejoke = JokeApiServiceFactory.createJAS().giveMeAJoke()
+        compositeDisposable.add(Singledejoke
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onError = {
+                    Log.e(tag, "Je n'arrive pas a lire le Single", it)
+                },
+                onSuccess = {
+                    Log.i(tag, it.value)
+                    adapter.updateList(it)
+
+                }
+            ))
     }
 }
