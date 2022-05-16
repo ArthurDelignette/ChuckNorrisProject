@@ -8,9 +8,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chucknorrisproject.R.id.buttonAddJoke
+import com.example.chucknorrisproject.R.id.progressBar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -38,20 +40,26 @@ class MainActivity : AppCompatActivity() {
         // This loop will create 20 Views containing
 
         val button = findViewById<Button>(buttonAddJoke)
+        val progressBar = findViewById<ProgressBar>(progressBar)
         button.setOnClickListener(View.OnClickListener {
             val Singledejoke = JokeApiServiceFactory.createJAS().giveMeAJoke()
-            compositeDisposable.add(Singledejoke
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(
-                    onError = {
-                        Log.e(tag, "Je n'arrive pas a lire le Single", it)
-                    },
-                    onSuccess = {
-                        Log.i(tag, it.value)
-                        adapter.updateList(it)
-                    }
-                ))
+            progressBar.visibility = View.VISIBLE
+            repeat(10){
+                compositeDisposable.add(Singledejoke
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribeBy(
+                        onError = {
+                            Log.e(tag, "Je n'arrive pas a lire le Single", it)
+                        },
+                        onSuccess = {
+                            Log.i(tag, it.value)
+                            adapter.updateList(it)
+
+                        }
+                    ))
+            }
+            progressBar.visibility = View.INVISIBLE
         })
 
 
