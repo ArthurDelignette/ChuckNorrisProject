@@ -2,11 +2,15 @@ package com.example.chucknorrisproject
 
 import CustomAdapter
 import Joke
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.chucknorrisproject.R.id.buttonAddJoke
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -16,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     val compositeDisposable = CompositeDisposable()
     private val tag = "Main"
     val adapter = CustomAdapter()
+
+    @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -31,20 +37,24 @@ class MainActivity : AppCompatActivity() {
 
         // This loop will create 20 Views containing
 
+        val button = findViewById<Button>(buttonAddJoke)
+        button.setOnClickListener(View.OnClickListener {
+            val Singledejoke = JokeApiServiceFactory.createJAS().giveMeAJoke()
+            compositeDisposable.add(Singledejoke
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(
+                    onError = {
+                        Log.e(tag, "Je n'arrive pas a lire le Single", it)
+                    },
+                    onSuccess = {
+                        Log.i(tag, it.value)
+                        adapter.updateList(it)
+                    }
+                ))
+        })
 
-        val Singledejoke = JokeApiServiceFactory.createJAS().giveMeAJoke()
-        compositeDisposable.add(Singledejoke
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(
-                onError = {
-                    Log.e(tag, "Je n'arrive pas a lire le Single", it)
-                },
-                onSuccess = {
-                    Log.i(tag, it.value)
-                    adapter.updateList(it)
-                }
-            ))
+
 
 
         // This will pass the ArrayList to our Adapter
